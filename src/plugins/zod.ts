@@ -3,13 +3,13 @@ import fp from 'fastify-plugin';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 /**
- * This plugin enables the JSON Schema validation to work properly with Zod schemas
- * It adds serialization and validation capabilities through the Zod type provider
+ * This plugin enables Zod for fastify type-provider functionality
+ * 
+ * This plugin doesn't need to do anything special, as the ZodTypeProvider
+ * is used directly in the routes via fastify.withTypeProvider<ZodTypeProvider>()
  */
 const zodPlugin: FastifyPluginAsync = async (fastify) => {
-  // We don't need to do anything special here
-  // The ZodTypeProvider will be used directly in the routes 
-  // via fastify.withTypeProvider<ZodTypeProvider>()
+  // Nothing to do here - the ZodTypeProvider is used directly in routes
 };
 
 export default fp(zodPlugin, {

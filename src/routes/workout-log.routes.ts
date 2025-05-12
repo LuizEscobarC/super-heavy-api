@@ -9,111 +9,105 @@ const workoutLogRoutes: FastifyPluginAsync = async (fastify) => {
   const zodFastify = fastify.withTypeProvider<ZodTypeProvider>();
 
   // Start a workout (create log)
-  zodFastify.post(
-    '/workouts/:id/start',
-    {
-      schema: {
-        tags: ['workout-logs'],
-        summary: 'Start a workout',
-        description: 'Creates a workout log entry to track exercise performance',
-        params: z.object({
-          id: z.string().uuid()
-        }),
-        body: startWorkoutSchema,
-      },
+  zodFastify.route({
+    method: 'POST',
+    url: '/workouts/:id/start',
+    schema: {
+      params: z.object({
+        id: z.string().uuid()
+      }),
+      body: startWorkoutSchema,
     },
-    workoutLogController.startWorkout.bind(workoutLogController)
-  );
+    handler: async (request, reply) => {
+      const typedRequest = request as any;
+      return workoutLogController.startWorkout(typedRequest, reply);
+    }
+  });
 
   // Complete a workout
-  zodFastify.patch(
-    '/workouts/:id/logs/:logId/complete',
-    {
-      schema: {
-        tags: ['workout-logs'],
-        summary: 'Complete a workout',
-        description: 'Marks a workout log as completed',
-        params: z.object({
-          id: z.string().uuid(),
-          logId: z.string(),
-        }),
-        body: completeWorkoutSchema,
-      },
+  zodFastify.route({
+    method: 'PATCH',
+    url: '/workouts/:id/logs/:logId/complete',
+    schema: {
+      params: z.object({
+        id: z.string().uuid(),
+        logId: z.string(),
+      }),
+      body: completeWorkoutSchema,
     },
-    workoutLogController.completeWorkout.bind(workoutLogController)
-  );
+    handler: async (request, reply) => {
+      const typedRequest = request as any;
+      return workoutLogController.completeWorkout(typedRequest, reply);
+    }
+  });
 
   // Add exercise log during workout
-  zodFastify.post(
-    '/workouts/:id/logs/:logId/exercises',
-    {
-      schema: {
-        tags: ['workout-logs'],
-        summary: 'Log exercise performance',
-        description: 'Records sets, reps and weight for an exercise during a workout',
-        params: z.object({
-          id: z.string().uuid(),
-          logId: z.string(),
-        }),
-        body: addExerciseLogSchema,
-      },
+  zodFastify.route({
+    method: 'POST',
+    url: '/workouts/:id/logs/:logId/exercises',
+    schema: {
+      params: z.object({
+        id: z.string().uuid(),
+        logId: z.string(),
+      }),
+      body: addExerciseLogSchema,
     },
-    workoutLogController.addExerciseLog.bind(workoutLogController)
-  );
+    handler: async (request, reply) => {
+      const typedRequest = request as any;
+      return workoutLogController.addExerciseLog(typedRequest, reply);
+    }
+  });
 
   // Complete an exercise log
-  zodFastify.patch(
-    '/workouts/:id/logs/:logId/exercises/:exerciseLogId/complete',
-    {
-      schema: {
-        tags: ['workout-logs'],
-        summary: 'Complete an exercise',
-        description: 'Marks an exercise log as completed during a workout',
-        params: z.object({
-          id: z.string().uuid(),
-          logId: z.string(),
-          exerciseLogId: z.string(),
-        }),
-        body: completeExerciseLogSchema,
-      },
+  zodFastify.route({
+    method: 'PATCH',
+    url: '/workouts/:id/logs/:logId/exercises/:exerciseLogId/complete',
+    schema: {
+      params: z.object({
+        id: z.string().uuid(),
+        logId: z.string(),
+        exerciseLogId: z.string(),
+      }),
+      body: completeExerciseLogSchema,
     },
-    workoutLogController.completeExerciseLog.bind(workoutLogController)
-  );
+    handler: async (request, reply) => {
+      const typedRequest = request as any;
+      return workoutLogController.completeExerciseLog(typedRequest, reply);
+    }
+  });
 
   // Get all workout logs
-  zodFastify.get(
-    '/logs',
-    {
-      schema: {
-        tags: ['workout-logs'],
-        summary: 'List workout logs',
-        description: 'Returns a list of workout logs with optional filtering by workout ID',
-        querystring: z.object({
-          workoutId: z.string().uuid().optional(),
-          limit: z.number().int().default(20),
-          page: z.number().int().default(1),
-        }),
-      },
+  zodFastify.route({
+    method: 'GET',
+    url: '/logs',
+    schema: {
+      querystring: z.object({
+        workoutId: z.string().uuid().optional(),
+        limit: z.number().int().default(20),
+        page: z.number().int().default(1),
+      }),
     },
-    workoutLogController.getWorkoutLogs.bind(workoutLogController)
-  );
+    handler: async (request, reply) => {
+      const typedRequest = request as any;
+      return workoutLogController.getWorkoutLogs(typedRequest, reply);
+    }
+  });
 
   // Get exercise logs for a workout
-  zodFastify.get(
-    '/workouts/:id/logs/:logId/exercises',
-    {
-      schema: {
-        tags: ['workout-logs'],
-        summary: 'List exercise logs',
-        description: 'Returns exercise logs for a specific workout session',
-        params: z.object({
-          id: z.string().uuid(),
-          logId: z.string(),
-        }),
-      },
+  zodFastify.route({
+    method: 'GET',
+    url: '/workouts/:id/logs/:logId',
+    schema: {
+      params: z.object({
+        id: z.string().uuid(),
+        logId: z.string(),
+      }),
     },
-    workoutLogController.getExerciseLogs.bind(workoutLogController)
-  );
+    handler: async (request, reply) => {
+      const typedRequest = request as any;
+      return workoutLogController.getExerciseLogs(typedRequest, reply);
+    }
+  });
 };
 
 export default workoutLogRoutes;
