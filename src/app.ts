@@ -1,29 +1,58 @@
-import fastify from 'fastify'
-import { appRoutes } from './http/routes'
-import { ZodError } from 'zod'
-import { env } from './env'
-import { fastifyJwt } from '@fastify/jwt'
+import Fastify, { FastifyInstance } from 'fastify';
+import fastifyCors from '@fastify/cors';
+import fastifyHelmet from '@fastify/helmet';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
+import fastifySensible from '@fastify/sensible';
 
-export const app = fastify()
+import { envConfig } from './config/env';
+import { logger } from './utils/logger';
+import errorHandler from './plugins/error-handler';
 
-app.register(fastifyJwt, {
-  secret: env.JWT_SECRET
-})
+import workoutRoutes from './routes/workout.routes';
+import workoutLogRoutes from './routes/workout-log.routes';
 
-app.register(appRoutes)
+export const build = async (): Promise<FastifyInstance> => {
+  const fastify = Fastify({
+    logger,
+    ignoreTrailingSlash: true,
+  });
 
-app.setErrorHandler((error, _, reply) => {
-  if (error instanceof ZodError) {
-    return reply
-      .status(400)
-      .send({ message: 'Validation Error.', issues: error.format() })
-  }
+  // Register plugins
+  await fastify.register(fastifyCors);
+  await fastify.register(fastifyHelmet);
+  await fastify.register(fastifySensible);
+  
+  // Custom error handler
+  await fastify.register(errorHandler);
 
-  if (env.NODE_ENV !== 'production') {
-    console.log(error)
-  } else {
-    // TODO: Here we should to log to an external tool like DataDog/NewRelic/Sentry
-  }
+  // Swagger documentation
+  await fastify.register(fastifySwagger, {
+    swagger: {
+      info: {
+        title: 'Workout Tracking API',
+        description: 'API for tracking workouts and exercises',
+        version: '1.0.0',
+      },
+      host: `${envConfig.HOST}:${envConfig.PORT}`,
+      schemes: ['http', 'https'],
+      consumes: ['application/json'],
+      produces: ['application/json'],
+    },
+  });
 
-  return reply.status(500).send({ message: 'Internal Server Error' })
-})
+  await fastify.register(fastifySwaggerUi, {
+    routePrefix: '/documentation',
+  });
+
+  // Register routes
+  await fastify.register(workoutRoutes, { prefix: '/workouts' });
+  await fastify.register(workoutLogRoutes, { prefix: '' });
+
+  // Health check
+  fastify.get('/health', async () => {
+    return { status: 'ok' };
+  });
+
+  return fastify;
+};

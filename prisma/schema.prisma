@@ -13,39 +13,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String    @unique
-  password_hash String
-  created_at    DateTime  @default(now())
-  CheckIns      CheckIn[]
-
-  @@map("users")
-}
-
-model CheckIn {
-  id           String    @id @default(uuid())
-  created_at   DateTime  @default(now())
-  validated_at DateTime?
-
-  user    User   @relation(fields: [user_id], references: [id])
-  user_id String
-
-  gym    Gym    @relation(fields: [gym_id], references: [id])
-  gym_id String
-
-  @@map("check_ins")
-}
-
-model Gym {
-  id          String    @id @default(uuid())
-  title       String
+model Workout {
+  id          String            @id @default(uuid())
+  name        String
   description String?
-  phone       String?
-  lataitude   Decimal
-  longitude   Decimal
-  CheckIns    CheckIn[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  exercises   WorkoutExercise[]
 
-  @@map("gyms")
+  @@map("workouts")
+}
+
+model Exercise {
+  id          String            @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  workouts    WorkoutExercise[]
+
+  @@map("exercises")
+}
+
+model WorkoutExercise {
+  id         String   @id @default(uuid())
+  workoutId  String
+  exerciseId String
+  order      Int
+  sets       Int      @default(3)
+  reps       Int      @default(12)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  workout    Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@map("workout_exercises")
 }
