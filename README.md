@@ -69,6 +69,15 @@ npm run dev
 - `GET /workouts/:id` - Get details of a workout with its exercises
 - `POST /workouts/:id/exercises` - Add an exercise to a workout
 
+### Exercises
+
+- `POST /exercises` - Create a new exercise
+- `GET /exercises` - List all exercises
+- `GET /exercises/:id` - Get details of an exercise
+- `GET /exercises/:id/workouts` - Get an exercise with workouts it belongs to
+- `PATCH /exercises/:id` - Update an exercise
+- `DELETE /exercises/:id` - Delete an exercise
+
 ### Workout Logs
 
 - `POST /workouts/:id/start` - Start a workout (create log)

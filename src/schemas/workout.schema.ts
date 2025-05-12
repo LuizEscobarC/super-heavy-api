@@ -44,9 +44,9 @@ export const workoutExerciseSchema = z.object({
 
 export const addExerciseToWorkoutSchema = z.object({
   exerciseId: z.string().uuid('Invalid exercise ID'),
-  order: z.number().int().positive('Order must be positive'),
-  sets: z.number().int().positive().default(3),
-  reps: z.number().int().positive().default(12),
+  order: z.coerce.number().int().positive('Order must be positive'),
+  sets: z.coerce.number().int().positive().default(3),
+  reps: z.coerce.number().int().positive().default(12),
 });
 
 // Types for use in controllers and services

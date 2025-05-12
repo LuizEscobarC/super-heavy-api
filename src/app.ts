@@ -13,6 +13,7 @@ import zodPlugin from './plugins/zod';
 
 import workoutRoutes from './routes/workout.routes';
 import workoutLogRoutes from './routes/workout-log.routes';
+import exerciseRoutes from './routes/exercise.routes';
 
 export const build = async (): Promise<FastifyInstance> => {
   const fastify = Fastify({
@@ -65,6 +66,7 @@ export const build = async (): Promise<FastifyInstance> => {
 
   // Register routes
   await fastify.register(workoutRoutes, { prefix: '/workouts' });
+  await fastify.register(exerciseRoutes, { prefix: '/exercises' });
   await fastify.register(workoutLogRoutes, { prefix: '' });
 
   // Health check
