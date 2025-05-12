@@ -24,66 +24,6 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
 
-  // Get all workouts
-  zodFastify.route({
-    method: 'GET',
-    url: '/',
-    schema: {
-      response: {
-        200: z.array(workoutSchema)
-      }
-    },
-    handler: async (request, reply) => {
-      return workoutController.getAllWorkouts(request, reply);
-    }
-  });
-
-  // Get workout by ID with exercises
-  zodFastify.route({
-    method: 'GET',
-    url: '/:id',
-    schema: {
-      params: z.object({
-        id: z.string().uuid()
-      }),
-      response: {
-        200: workoutSchema.extend({
-          exercises: z.array(z.object({
-            id: z.string().uuid(),
-            exerciseId: z.string().uuid(),
-            exercise: z.object({
-              id: z.string().uuid(),
-              name: z.string(),
-              description: z.string().nullable()
-            }),
-            order: z.number(),
-            sets: z.number(),
-            reps: z.number()
-          })).optional()
-        })
-      }
-    },
-    handler: async (request, reply) => {
-      const typedRequest = request as any;
-      return workoutController.getWorkoutById(typedRequest, reply);
-    }
-  });
-
-  // Add exercise to workout
-  zodFastify.route({
-    method: 'POST',
-    url: '/:id/exercises',
-    schema: {
-      params: z.object({
-        id: z.string().uuid()
-      }),
-      body: addExerciseToWorkoutSchema
-    },
-    handler: async (request, reply) => {
-      const typedRequest = request as any;
-      return workoutController.addExerciseToWorkout(typedRequest, reply);
-    }
-  });
 };
 
 export default workoutRoutes;
