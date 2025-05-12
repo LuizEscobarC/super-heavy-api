@@ -1,126 +1,119 @@
 import { FastifyPluginAsync } from 'fastify';
 import { WorkoutLogController } from '../controllers/workout-log.controller';
-import { 
-  startWorkoutSchema, 
-  completeWorkoutSchema, 
-  addExerciseLogSchema, 
-  completeExerciseLogSchema 
-} from '../schemas/workout-log.schema';
+import { addExerciseLogSchema, completeExerciseLogSchema, completeWorkoutSchema, startWorkoutSchema } from '../schemas/workout-log.schema';
+import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { z } from 'zod';
 
 const workoutLogRoutes: FastifyPluginAsync = async (fastify) => {
   const workoutLogController = new WorkoutLogController();
+  const zodFastify = fastify.withTypeProvider<ZodTypeProvider>();
 
   // Start a workout (create log)
-  fastify.post('/workouts/:id/start', {
-    schema: {
-      tags: ['workout-logs'],
-      summary: 'Start a workout',
-      description: 'Creates a workout log entry to track exercise performance',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-        },
-        required: ['id'],
+  zodFastify.post(
+    '/workouts/:id/start',
+    {
+      schema: {
+        tags: ['workout-logs'],
+        summary: 'Start a workout',
+        description: 'Creates a workout log entry to track exercise performance',
+        params: z.object({
+          id: z.string().uuid()
+        }),
+        body: startWorkoutSchema,
       },
-      body: startWorkoutSchema,
     },
-    handler: workoutLogController.startWorkout.bind(workoutLogController),
-  });
+    workoutLogController.startWorkout.bind(workoutLogController)
+  );
 
   // Complete a workout
-  fastify.patch('/workouts/:id/logs/:logId/complete', {
-    schema: {
-      tags: ['workout-logs'],
-      summary: 'Complete a workout',
-      description: 'Marks a workout log as completed',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          logId: { type: 'string' },
-        },
-        required: ['id', 'logId'],
+  zodFastify.patch(
+    '/workouts/:id/logs/:logId/complete',
+    {
+      schema: {
+        tags: ['workout-logs'],
+        summary: 'Complete a workout',
+        description: 'Marks a workout log as completed',
+        params: z.object({
+          id: z.string().uuid(),
+          logId: z.string(),
+        }),
+        body: completeWorkoutSchema,
       },
-      body: completeWorkoutSchema,
     },
-    handler: workoutLogController.completeWorkout.bind(workoutLogController),
-  });
+    workoutLogController.completeWorkout.bind(workoutLogController)
+  );
 
   // Add exercise log during workout
-  fastify.post('/workouts/:id/logs/:logId/exercises', {
-    schema: {
-      tags: ['workout-logs'],
-      summary: 'Log exercise performance',
-      description: 'Records sets, reps and weight for an exercise during a workout',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          logId: { type: 'string' },
-        },
-        required: ['id', 'logId'],
+  zodFastify.post(
+    '/workouts/:id/logs/:logId/exercises',
+    {
+      schema: {
+        tags: ['workout-logs'],
+        summary: 'Log exercise performance',
+        description: 'Records sets, reps and weight for an exercise during a workout',
+        params: z.object({
+          id: z.string().uuid(),
+          logId: z.string(),
+        }),
+        body: addExerciseLogSchema,
       },
-      body: addExerciseLogSchema,
     },
-    handler: workoutLogController.addExerciseLog.bind(workoutLogController),
-  });
+    workoutLogController.addExerciseLog.bind(workoutLogController)
+  );
 
   // Complete an exercise log
-  fastify.patch('/workouts/:id/logs/:logId/exercises/:exerciseLogId/complete', {
-    schema: {
-      tags: ['workout-logs'],
-      summary: 'Complete an exercise',
-      description: 'Marks an exercise log as completed during a workout',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          logId: { type: 'string' },
-          exerciseLogId: { type: 'string' },
-        },
-        required: ['id', 'logId', 'exerciseLogId'],
+  zodFastify.patch(
+    '/workouts/:id/logs/:logId/exercises/:exerciseLogId/complete',
+    {
+      schema: {
+        tags: ['workout-logs'],
+        summary: 'Complete an exercise',
+        description: 'Marks an exercise log as completed during a workout',
+        params: z.object({
+          id: z.string().uuid(),
+          logId: z.string(),
+          exerciseLogId: z.string(),
+        }),
+        body: completeExerciseLogSchema,
       },
-      body: completeExerciseLogSchema,
     },
-    handler: workoutLogController.completeExerciseLog.bind(workoutLogController),
-  });
+    workoutLogController.completeExerciseLog.bind(workoutLogController)
+  );
 
   // Get all workout logs
-  fastify.get('/logs', {
-    schema: {
-      tags: ['workout-logs'],
-      summary: 'List workout logs',
-      description: 'Returns a list of workout logs with optional filtering by workout ID',
-      querystring: {
-        type: 'object',
-        properties: {
-          workoutId: { type: 'string', format: 'uuid' },
-          limit: { type: 'integer', default: 20 },
-          page: { type: 'integer', default: 1 },
-        },
+  zodFastify.get(
+    '/logs',
+    {
+      schema: {
+        tags: ['workout-logs'],
+        summary: 'List workout logs',
+        description: 'Returns a list of workout logs with optional filtering by workout ID',
+        querystring: z.object({
+          workoutId: z.string().uuid().optional(),
+          limit: z.number().int().default(20),
+          page: z.number().int().default(1),
+        }),
       },
     },
-    handler: workoutLogController.getWorkoutLogs.bind(workoutLogController),
-  });
+    workoutLogController.getWorkoutLogs.bind(workoutLogController)
+  );
 
   // Get exercise logs for a workout
-  fastify.get('/workouts/:id/logs/:logId/exercises', {
-    schema: {
-      tags: ['workout-logs'],
-      summary: 'List exercise logs',
-      description: 'Returns exercise logs for a specific workout session',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          logId: { type: 'string' },
-        },
-        required: ['id', 'logId'],
+  zodFastify.get(
+    '/workouts/:id/logs/:logId/exercises',
+    {
+      schema: {
+        tags: ['workout-logs'],
+        summary: 'List exercise logs',
+        description: 'Returns exercise logs for a specific workout session',
+        params: z.object({
+          id: z.string().uuid(),
+          logId: z.string(),
+        }),
       },
     },
-    handler: workoutLogController.getExerciseLogs.bind(workoutLogController),
-  });
+    workoutLogController.getExerciseLogs.bind(workoutLogController)
+  );
 };
 
 export default workoutLogRoutes;
