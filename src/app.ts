@@ -4,7 +4,7 @@ import fastifyHelmet from '@fastify/helmet';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifySensible from '@fastify/sensible';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
 
 import { envConfig } from './config/env';
 import { logger } from './utils/logger';
@@ -29,7 +29,7 @@ export const build = async (): Promise<FastifyInstance> => {
         : undefined,
     },
     ignoreTrailingSlash: true,
-  });
+  }).withTypeProvider<ZodTypeProvider>();
 
   // Register plugins
   await fastify.register(fastifyCors);
@@ -37,7 +37,8 @@ export const build = async (): Promise<FastifyInstance> => {
   await fastify.register(fastifySensible);
   
   // Register Zod plugin
-  await fastify.register(zodPlugin);
+  fastify.setValidatorCompiler(validatorCompiler);
+  fastify.setSerializerCompiler(serializerCompiler);
   
   // Custom error handler
   await fastify.register(errorHandler);
@@ -55,6 +56,7 @@ export const build = async (): Promise<FastifyInstance> => {
       consumes: ['application/json'],
       produces: ['application/json'],
     },
+    transform: jsonSchemaTransform,
   });
 
   await fastify.register(fastifySwaggerUi, {
