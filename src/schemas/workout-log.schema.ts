@@ -33,7 +33,7 @@ export const exerciseLogSchema = z.object({
   workoutLogId: z.string(),
   exerciseId: z.string().uuid(),
   workoutExerciseId: z.string().uuid(),
-  sets: z.array(exerciseSetSchema),
+  series: z.array(exerciseSetSchema),
   notes: z.string().nullable().optional(),
   completed: z.boolean().default(false),
   completedAt: z.date().nullable().optional(),
@@ -44,7 +44,7 @@ export const exerciseLogSchema = z.object({
 export const addExerciseLogSchema = z.object({
   exerciseId: z.string().uuid('Invalid exercise ID'),
   workoutExerciseId: z.string().uuid('Invalid workout exercise ID'),
-  sets: z.array(
+  series: z.array(
     z.object({
       weight: z.number().nonnegative('Weight must be non-negative'),
       reps: z.number().int().positive('Reps must be positive'),
@@ -52,6 +52,7 @@ export const addExerciseLogSchema = z.object({
     })
   ),
   notes: z.string().optional(),
+  rest: z.number().int().positive().optional(),
 });
 
 export const completeExerciseLogSchema = z.object({

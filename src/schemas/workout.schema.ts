@@ -36,8 +36,10 @@ export const workoutExerciseSchema = z.object({
   workoutId: z.string().uuid(),
   exerciseId: z.string().uuid(),
   order: z.number().int().positive(),
-  sets: z.number().int().positive().default(3),
+  series: z.number().int().positive().default(3),
   reps: z.number().int().positive().default(12),
+  weight: z.number().nonnegative().default(0),
+  rest: z.number().int().positive().default(60),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -45,8 +47,10 @@ export const workoutExerciseSchema = z.object({
 export const addExerciseToWorkoutSchema = z.object({
   exerciseId: z.string().uuid('Invalid exercise ID'),
   order: z.coerce.number().int().positive('Order must be positive'),
-  sets: z.coerce.number().int().positive().default(3),
+  series: z.coerce.number().int().positive().default(3),
   reps: z.coerce.number().int().positive().default(12),
+  weight: z.coerce.number().nonnegative().default(0),
+  rest: z.coerce.number().int().positive().default(60),
 });
 
 // Types for use in controllers and services

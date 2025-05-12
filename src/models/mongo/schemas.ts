@@ -21,10 +21,11 @@ export interface IExerciseLog extends Document {
   workoutLogId: string;
   exerciseId: string;
   workoutExerciseId: string;
-  sets: IExerciseSet[];
+  series: IExerciseSet[];
   notes?: string;
   completed: boolean;
   completedAt?: Date;
+  rest: number; // rest period in seconds
   createdAt: Date;
   updatedAt: Date;
 }
@@ -49,7 +50,7 @@ const exerciseLogSchema = new Schema<IExerciseLog>(
     workoutLogId: { type: String, required: true, index: true },
     exerciseId: { type: String, required: true },
     workoutExerciseId: { type: String, required: true },
-    sets: [
+    series: [
       {
         weight: { type: Number, required: true },
         reps: { type: Number, required: true },
@@ -60,6 +61,7 @@ const exerciseLogSchema = new Schema<IExerciseLog>(
     notes: { type: String },
     completed: { type: Boolean, default: false },
     completedAt: { type: Date },
+    rest: { type: Number, default: 60 }, // rest period in seconds
   },
   { timestamps: true }
 );

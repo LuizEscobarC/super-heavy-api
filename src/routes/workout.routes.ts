@@ -53,8 +53,10 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
               description: z.string().nullable()
             }),
             order: z.number(),
-            sets: z.number(),
-            reps: z.number()
+            series: z.number(),
+            reps: z.number(),
+            weight: z.number(),
+            rest: z.number()
           })).optional()
         })
       }
@@ -80,8 +82,10 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
           workoutId: z.string().uuid(),
           exerciseId: z.string().uuid(),
           order: z.number(),
-          sets: z.number(),
+          series: z.number(),
           reps: z.number(),
+          weight: z.number(),
+          rest: z.number(),
           createdAt: z.date(),
           updatedAt: z.date(),
         })

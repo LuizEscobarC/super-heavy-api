@@ -68,8 +68,10 @@ export class WorkoutRepository {
         workoutId,
         exerciseId: data.exerciseId,
         order: data.order,
-        sets: data.sets,
+        series: data.series,
         reps: data.reps,
+        weight: data.weight,
+        rest: data.rest,
       },
     });
   }

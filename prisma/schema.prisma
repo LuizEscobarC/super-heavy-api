@@ -40,8 +40,10 @@ model WorkoutExercise {
   workoutId  String
   exerciseId String
   order      Int
-  sets       Int      @default(3)
+  series     Int      @default(3)
   reps       Int      @default(12)
+  weight     Float    @default(0)
+  rest       Int      @default(60) // in seconds
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   workout    Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)

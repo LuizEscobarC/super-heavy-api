@@ -77,7 +77,7 @@ const exerciseRoutes: FastifyPluginAsync = async (fastify) => {
               description: z.string().nullable()
             }),
             order: z.number(),
-            sets: z.number(),
+            series: z.number(),
             reps: z.number()
           }))
         })

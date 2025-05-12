@@ -1,6 +1,7 @@
 import { WorkoutLog, ExerciseLog, IWorkoutLog, IExerciseLog } from '../models/mongo/schemas';
 import { NotFoundError } from '../utils/errors';
 import { StartWorkoutInput, AddExerciseLogInput, CompleteWorkoutInput } from '../schemas/workout-log.schema';
+import { prisma } from '../config/database';
 
 export class WorkoutLogRepository {
   async startWorkout(workoutId: string, data: StartWorkoutInput): Promise<IWorkoutLog> {
@@ -69,12 +70,27 @@ export class WorkoutLogRepository {
       throw new Error('Cannot add exercises to a completed or canceled workout');
     }
 
+    // Get the rest value from the workout exercise if not provided
+    let restPeriod = data.rest;
+    if (!restPeriod) {
+      const workoutExercise = await prisma.workoutExercise.findUnique({
+        where: { id: data.workoutExerciseId }
+      });
+      
+      if (workoutExercise) {
+        restPeriod = workoutExercise.rest;
+      } else {
+        restPeriod = 60;
+      }
+    }
+
     const exerciseLog = new ExerciseLog({
       workoutLogId,
       exerciseId: data.exerciseId,
       workoutExerciseId: data.workoutExerciseId,
-      sets: data.sets,
+      series: data.series,
       notes: data.notes,
+      rest: restPeriod
     });
 
     return exerciseLog.save();
