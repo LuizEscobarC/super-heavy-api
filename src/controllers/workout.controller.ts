@@ -49,4 +49,14 @@ export class WorkoutController {
     
     return reply.status(201).send(workoutExercise);
   }
+
+  async getWorkoutExercises(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply
+  ) {
+    const { id } = request.params;
+    const exercises = await this.workoutService.getWorkoutExercises(id);
+    
+    return reply.send(exercises);
+  }
 }

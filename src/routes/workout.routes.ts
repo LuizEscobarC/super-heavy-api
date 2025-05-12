@@ -96,6 +96,36 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
       return workoutController.addExerciseToWorkout(typedRequest, reply);
     }
   });
+
+  // Get exercises for a workout
+  fastify.route({
+    method: 'GET',
+    url: '/:id/exercises',
+    schema: {
+      params: z.object({
+        id: z.string().uuid()
+      }),
+      response: {
+        200: z.array(z.object({
+          id: z.string().uuid(),
+          exerciseId: z.string().uuid(),
+          exercise: z.object({
+            id: z.string().uuid(),
+            name: z.string(),
+            description: z.string().nullable()
+          }),
+          order: z.number(),
+          series: z.number(),
+          reps: z.number(),
+          weight: z.number(),
+          rest: z.number()
+        }))
+      }
+    },
+    handler: async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
+      return workoutController.getWorkoutExercises(request, reply);
+    }
+  });
 };
 
 export default workoutRoutes;
