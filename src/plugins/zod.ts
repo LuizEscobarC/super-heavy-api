@@ -1,6 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 /**
  * This plugin enables Zod for fastify type-provider functionality
