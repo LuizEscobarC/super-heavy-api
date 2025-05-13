@@ -47,7 +47,12 @@ export class WorkoutService {
     return workout.exercises.map(exercise => ({
       id: exercise.id,
       exerciseId: exercise.exerciseId,
-      exercise: exercise.exercise,
+      exercise: {
+        id: exercise.exercise.id,
+        name: exercise.exercise.name,
+        muscle: exercise.exercise.muscle,
+        description: exercise.exercise.description
+      },
       order: exercise.order,
       series: exercise.series,
       reps: exercise.reps,

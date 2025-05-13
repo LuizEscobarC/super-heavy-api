@@ -20,6 +20,7 @@ export const updateWorkoutSchema = createWorkoutSchema.partial();
 export const exerciseSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(3, 'Name must be at least 3 characters'),
+  muscle: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),

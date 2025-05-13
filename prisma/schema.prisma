@@ -27,6 +27,7 @@ model Workout {
 model Exercise {
   id          String            @id @default(uuid())
   name        String
+  muscle      String?           @default("")
   description String?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt

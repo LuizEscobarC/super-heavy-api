@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const exerciseSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(3, 'Name must be at least 3 characters'),
+  muscle: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -11,6 +12,7 @@ export const exerciseSchema = z.object({
 
 export const createExerciseSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
+  muscle: z.string().optional(),
   description: z.string().optional(),
 });
 

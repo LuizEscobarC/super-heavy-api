@@ -22,7 +22,8 @@
     "test:watch": "jest --config tests/config/jest.json --runInBand --passWithNoTests --forceExit --detectOpenHandles --watchAll",
     "lint": "eslint '{src,test}/**/*.ts'",
     "lint:fix": "eslint --fix '{src,test}/**/*.ts'",
-    "format": "prettier --write 'src/**/*.ts'"
+    "format": "prettier --write 'src/**/*.ts'",
+    "seed:exercises": "ts-node -r tsconfig-paths/register ./prisma/seed-exercises.ts"
   },
   "dependencies": {
     "@fastify/ajv-compiler": "^4.0.1",

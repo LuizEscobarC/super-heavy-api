@@ -6,6 +6,7 @@ A REST API for tracking workouts and exercises built with Fastify, Prisma, and M
 
 - Create and manage workout plans
 - Add exercises to workouts with sets, reps, weight, and rest periods
+- Categorize exercises by muscle groups
 - Track workout execution with logs
 - Record sets, reps, and weights for exercises
 - Support for multiple database types (PostgreSQL and MongoDB)
@@ -71,11 +72,11 @@ npm run dev
 
 ### Exercises
 
-- `POST /exercises` - Create a new exercise
-- `GET /exercises` - List all exercises
-- `GET /exercises/:id` - Get details of an exercise
+- `POST /exercises` - Create a new exercise with name, muscle group, and description
+- `GET /exercises` - List all exercises with their muscle groups
+- `GET /exercises/:id` - Get details of an exercise including muscle group
 - `GET /exercises/:id/workouts` - Get an exercise with workouts it belongs to
-- `PATCH /exercises/:id` - Update an exercise
+- `PATCH /exercises/:id` - Update an exercise, including muscle group
 - `DELETE /exercises/:id` - Delete an exercise
 
 ### Workout Logs

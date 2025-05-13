@@ -34,7 +34,7 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
 
-  // // Get workout by ID with exercises
+  // Get workout by ID with exercises
   fastify.route({
     method: 'GET',
     url: '/:id',
@@ -50,6 +50,7 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
             exercise: z.object({
               id: z.string().uuid(),
               name: z.string(),
+              muscle: z.string().nullable(),
               description: z.string().nullable()
             }),
             order: z.number(),
@@ -67,7 +68,7 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
 
-  // // Add exercise to workout
+  // Add exercise to workout
   fastify.route({
     method: 'POST',
     url: '/:id/exercises',
@@ -112,6 +113,7 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
           exercise: z.object({
             id: z.string().uuid(),
             name: z.string(),
+            muscle: z.string().nullable(),
             description: z.string().nullable()
           }),
           order: z.number(),
