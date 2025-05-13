@@ -12,6 +12,16 @@ export class WorkoutService {
     this.workoutRepository = new WorkoutRepository();
   }
 
+  async updateWorkout(id: string, data: CreateWorkoutInput) {
+    const workout = await this.workoutRepository.findById(id);
+    
+    if (!workout) {
+      throw new NotFoundError(`Workout with ID ${id} not found`);
+    }
+    
+    return this.workoutRepository.update(id, data);
+  }
+
   async createWorkout(data: CreateWorkoutInput) {
     return this.workoutRepository.create(data);
   }

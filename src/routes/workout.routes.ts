@@ -128,6 +128,25 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
       return workoutController.getWorkoutExercises(request, reply);
     }
   });
+
+  // ´PUT´ workout by ID
+  fastify.route({
+    method: 'PUT',
+    url: '/:id',
+    schema: {
+      params: z.object({
+        id: z.string().uuid()
+      }),
+      body: createWorkoutSchema,
+      response: {
+        200: workoutSchema
+      }
+    },
+    handler: async (request: FastifyRequest<{ Params: { id: string }, Body: CreateWorkoutInput }>, reply) => {
+      const typedRequest = request as any;
+      return workoutController.updateWorkout(typedRequest, reply);
+    }
+  });
 };
 
 export default workoutRoutes;

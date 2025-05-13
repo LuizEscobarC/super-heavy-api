@@ -4,6 +4,21 @@ import { AddExerciseToWorkoutInput, CreateWorkoutInput } from '../schemas/workou
 import { NotFoundError } from '../utils/errors';
 
 export class WorkoutRepository {
+  async update(id: string, data: CreateWorkoutInput): Promise<Workout> {
+    const workout = await prisma.workout.findUnique({
+      where: { id },
+    });
+
+    if (!workout) {
+      throw new NotFoundError(`Workout with ID ${id} not found`);
+    }
+
+    return prisma.workout.update({
+      where: { id },
+      data,
+    });
+  }
+
   async create(data: CreateWorkoutInput): Promise<Workout> {
     return prisma.workout.create({
       data,

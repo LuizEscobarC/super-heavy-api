@@ -12,6 +12,22 @@ export class WorkoutController {
     this.workoutService = new WorkoutService();
   }
 
+  async updateWorkout(
+    request: FastifyRequest<{ Params: { id: string }, Body: CreateWorkoutInput }>,
+    reply: FastifyReply
+  ) {
+    const { id } = request.params;
+    const workout = await this.workoutService.getWorkoutById(id);
+    
+    if (!workout) {
+      return reply.status(404).send({ message: 'Workout not found' });
+    }
+    
+    const updatedWorkout = await this.workoutService.updateWorkout(id, request.body);
+    
+    return reply.status(200).send(updatedWorkout);
+  }
+
   async createWorkout(
     request: FastifyRequest<{ Body: CreateWorkoutInput }>,
     reply: FastifyReply
