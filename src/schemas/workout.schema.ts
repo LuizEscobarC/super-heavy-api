@@ -10,7 +10,7 @@ export const workoutSchema = z.object({
 });
 
 export const createWorkoutSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters'),
+  name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
 });
 
@@ -46,12 +46,37 @@ export const workoutExerciseSchema = z.object({
 });
 
 export const addExerciseToWorkoutSchema = z.object({
-  exerciseId: z.string().uuid('Invalid exercise ID'),
+  exercise: z.object({
+    id: z.string().uuid('Invalid exercise ID'),
+    name: z.string().min(3, 'Name must be at least 3 characters'),
+    muscle: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+  }),
   order: z.coerce.number().int().positive('Order must be positive'),
   series: z.coerce.number().int().positive().default(3),
   reps: z.coerce.number().int().positive().default(12),
   weight: z.coerce.number().nonnegative().default(0),
   rest: z.coerce.number().int().positive().default(60),
+});
+
+export const updateWorkoutExerciseSchema = addExerciseToWorkoutSchema;
+
+export const workoutExerciseItemSchema = z.object({
+  exercise: z.object({
+    id: z.string().uuid('Invalid exercise ID'),
+    name: z.string().min(3, 'Name must be at least 3 characters'),
+    muscle: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+  }),
+  order: z.coerce.number().int().positive('Order must be positive'),
+  series: z.coerce.number().int().positive().default(3),
+  reps: z.coerce.number().int().positive().default(12),
+  weight: z.coerce.number().nonnegative().default(0),
+  rest: z.coerce.number().int().positive().default(60),
+});
+
+export const updateWorkoutExercisesSchema = z.object({
+  exercises: z.array(workoutExerciseItemSchema)
 });
 
 // Types for use in controllers and services
@@ -62,3 +87,5 @@ export type Exercise = z.infer<typeof exerciseSchema>;
 export type CreateExerciseInput = z.infer<typeof createExerciseSchema>;
 export type WorkoutExercise = z.infer<typeof workoutExerciseSchema>;
 export type AddExerciseToWorkoutInput = z.infer<typeof addExerciseToWorkoutSchema>;
+export type UpdateWorkoutExerciseInput = z.infer<typeof updateWorkoutExerciseSchema>;
+export type UpdateWorkoutExercisesInput = z.infer<typeof updateWorkoutExercisesSchema>;

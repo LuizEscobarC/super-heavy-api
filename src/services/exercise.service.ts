@@ -1,6 +1,7 @@
 import { CreateExerciseInput, UpdateExerciseInput } from '../schemas/exercise.schema';
 import { ExerciseRepository } from '../repositories/exercise.repository';
 import { NotFoundError } from '../utils/errors';
+import { WorkoutExercise } from '@prisma/client';
 
 export class ExerciseService {
   private exerciseRepository: ExerciseRepository;

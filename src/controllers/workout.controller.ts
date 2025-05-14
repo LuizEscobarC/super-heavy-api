@@ -2,14 +2,19 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { WorkoutService } from '../services/workout.service';
 import { 
   AddExerciseToWorkoutInput, 
-  CreateWorkoutInput
+  CreateWorkoutInput,
+  UpdateWorkoutExerciseInput,
+  UpdateWorkoutExercisesInput
 } from '../schemas/workout.schema';
+import { WorkoutExerciseService } from '@/services/workout-exercise.service';
 
 export class WorkoutController {
   private workoutService: WorkoutService;
+  private workoutExerciseService: WorkoutExerciseService;
 
   constructor() {
     this.workoutService = new WorkoutService();
+    this.workoutExerciseService = new WorkoutExerciseService();
   }
 
   async updateWorkout(
@@ -74,5 +79,20 @@ export class WorkoutController {
     const exercises = await this.workoutService.getWorkoutExercises(id);
     
     return reply.send(exercises);
+  }
+
+  async updateWorkoutExercises(
+    request: FastifyRequest<{
+      Params: { id: string },
+      Body: {exercises: UpdateWorkoutExerciseInput[]}
+    }>,
+    reply: FastifyReply
+  ) {
+    const { id } = request.params;
+    const { exercises } = request.body;
+
+    const updatedExercises = await this.workoutExerciseService.updateWorkoutExercises(id, exercises);
+    
+    return reply.status(200).send(updatedExercises);
   }
 }

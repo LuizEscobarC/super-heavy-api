@@ -1,6 +1,8 @@
+import { Workout, WorkoutExercise } from '@prisma/client';
 import { 
   AddExerciseToWorkoutInput, 
-  CreateWorkoutInput 
+  CreateWorkoutInput, 
+  UpdateWorkoutInput 
 } from '../schemas/workout.schema';
 import { WorkoutRepository } from '../repositories/workout.repository';
 import { NotFoundError } from '../utils/errors';
@@ -12,32 +14,20 @@ export class WorkoutService {
     this.workoutRepository = new WorkoutRepository();
   }
 
-  async updateWorkout(id: string, data: CreateWorkoutInput) {
-    const workout = await this.workoutRepository.findById(id);
-    
-    if (!workout) {
-      throw new NotFoundError(`Workout with ID ${id} not found`);
-    }
-    
-    return this.workoutRepository.update(id, data);
-  }
-
-  async createWorkout(data: CreateWorkoutInput) {
+  async createWorkout(data: CreateWorkoutInput): Promise<Workout> {
     return this.workoutRepository.create(data);
   }
 
-  async getAllWorkouts() {
+  async getAllWorkouts(): Promise<Workout[]> {
     return this.workoutRepository.findAll();
   }
 
-  async getWorkoutById(id: string) {
-    const workout = await this.workoutRepository.findById(id);
-    
-    if (!workout) {
-      throw new NotFoundError(`Workout with ID ${id} not found`);
-    }
-    
-    return workout;
+  async getWorkoutById(id: string): Promise<Workout | null> {
+    return this.workoutRepository.findById(id);
+  }
+
+  async updateWorkout(id: string, data: UpdateWorkoutInput): Promise<Workout> {
+    return this.workoutRepository.update(id, data);
   }
 
   async getWorkoutWithExercises(id: string) {
@@ -70,4 +60,5 @@ export class WorkoutService {
       rest: exercise.rest
     }));
   }
+
 }

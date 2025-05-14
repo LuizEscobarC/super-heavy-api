@@ -1,4 +1,4 @@
-import { Exercise } from '@prisma/client';
+import { Exercise, Prisma, WorkoutExercise } from '@prisma/client';
 import { prisma } from '../config/database';
 import { CreateExerciseInput, UpdateExerciseInput } from '../schemas/exercise.schema';
 import { NotFoundError } from '../utils/errors';
@@ -53,6 +53,27 @@ export class ExerciseRepository {
     
     return prisma.exercise.delete({
       where: { id },
+    });
+  }
+
+  async updateWorkoutExercises (
+    workoutId: string,
+    exercises: WorkoutExercise[],
+  ): Promise<Prisma.BatchPayload> {
+    const workout = await prisma.workout.findUnique({
+      where: { id: workoutId },
+    });
+
+    if (!workout) {
+      throw new NotFoundError(`Workout with ID ${workoutId} not found`);
+    }
+
+    await prisma.workoutExercise.deleteMany({
+      where: { workoutId },
+    });
+
+    return await prisma.workoutExercise.createMany({
+      data: exercises
     });
   }
 

@@ -1,6 +1,13 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { WorkoutController } from '../controllers/workout.controller';
-import { createWorkoutSchema, addExerciseToWorkoutSchema, workoutSchema, CreateWorkoutInput } from '../schemas/workout.schema';
+import { 
+  createWorkoutSchema, 
+  addExerciseToWorkoutSchema, 
+  workoutSchema, 
+  CreateWorkoutInput,
+  updateWorkoutExercisesSchema,
+  UpdateWorkoutExercisesInput
+} from '../schemas/workout.schema';
 import { z } from 'zod';
 
 const workoutRoutes: FastifyPluginAsync = async (fastify) => {
@@ -145,6 +152,26 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
     handler: async (request: FastifyRequest<{ Params: { id: string }, Body: CreateWorkoutInput }>, reply) => {
       const typedRequest = request as any;
       return workoutController.updateWorkout(typedRequest, reply);
+    }
+  });
+
+  // Update all exercises for a workout
+  fastify.route({
+    method: 'PUT',
+    url: '/:id/exercises',
+    schema: {
+      params: z.object({
+        id: z.string().uuid()
+      }),
+      body: updateWorkoutExercisesSchema,
+      response: {
+        200: z.object({
+          count: z.number()
+        })
+      }
+    },
+    handler: async (request: FastifyRequest<{ Params: { id: string }, Body: UpdateWorkoutExercisesInput }>, reply) => {
+      return workoutController.updateWorkoutExercises(request, reply);
     }
   });
 };

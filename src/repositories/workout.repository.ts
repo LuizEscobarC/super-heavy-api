@@ -1,10 +1,10 @@
 import { Workout, WorkoutExercise } from '@prisma/client';
 import { prisma } from '../config/database';
-import { AddExerciseToWorkoutInput, CreateWorkoutInput } from '../schemas/workout.schema';
+import { AddExerciseToWorkoutInput, CreateWorkoutInput, UpdateWorkoutInput } from '../schemas/workout.schema';
 import { NotFoundError } from '../utils/errors';
 
 export class WorkoutRepository {
-  async update(id: string, data: CreateWorkoutInput): Promise<Workout> {
+  async update(id: string, data: UpdateWorkoutInput): Promise<Workout> {
     const workout = await prisma.workout.findUnique({
       where: { id },
     });
