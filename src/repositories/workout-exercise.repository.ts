@@ -59,10 +59,10 @@ export class WorkoutExerciseRepository {
     workoutId: string,
     exercises: Prisma.WorkoutExerciseCreateManyInput[],
   ): Promise<Prisma.BatchPayload> {
-
-
     await prisma.workoutExercise.deleteMany({
-      where: { workoutId },
+      where: { 
+        workoutId
+      },
     });
 
     return await prisma.workoutExercise.createMany({

@@ -19,7 +19,7 @@ export class WorkoutService {
   }
 
   async getAllWorkouts(): Promise<Workout[]> {
-    return this.workoutRepository.findAll();
+    return await this.workoutRepository.findAll();
   }
 
   async getWorkoutById(id: string): Promise<Workout | null> {

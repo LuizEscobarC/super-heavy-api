@@ -71,17 +71,17 @@ export class WorkoutRepository {
 
     // Check if exercise exists
     const exercise = await prisma.exercise.findUnique({
-      where: { id: data.exerciseId },
+      where: { id: data.exercise.id },
     });
 
     if (!exercise) {
-      throw new NotFoundError(`Exercise with ID ${data.exerciseId} not found`);
+      throw new NotFoundError(`Exercise with ID ${data.exercise.id} not found`);
     }
 
     return prisma.workoutExercise.create({
       data: {
         workoutId,
-        exerciseId: data.exerciseId,
+        exerciseId: data.exercise.id,
         order: data.order,
         series: data.series,
         reps: data.reps,

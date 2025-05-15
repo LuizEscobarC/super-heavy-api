@@ -25,10 +25,13 @@ export class WorkoutExerciseService {
     workoutId: string,
     data: AddExerciseToWorkoutInput
   ): Promise<WorkoutExercise> {
-    const workoutExercise = {
+    
+    const workoutExercise: Prisma.WorkoutExerciseUncheckedCreateInput = {
         ...data,
         workoutId,
+        exerciseId: data.exercise.id,
     }
+
     return this.repository.create(workoutExercise);
   }
 
@@ -57,12 +60,12 @@ export class WorkoutExerciseService {
       rest: wExercise.rest
     }));
 
-    const workout = this.workoutRepository.findById(workoutId);
+    const workout = await this.workoutRepository.findById(workoutId);
 
     if (!workout) {
       throw new Error(`Workout with ID ${workoutId} not found`);
     }
 
-    return this.repository.updateWorkoutExercises(workoutId, exercisesToUpdate);
+    return await this.repository.updateWorkoutExercises(workoutId, exercisesToUpdate);
   }
 }
