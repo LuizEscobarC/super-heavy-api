@@ -6,12 +6,16 @@ import {
 } from '../schemas/workout.schema';
 import { WorkoutRepository } from '../repositories/workout.repository';
 import { NotFoundError } from '../utils/errors';
+import { prisma } from '@/config/database';
+import { WorkoutExerciseRepository } from '@/repositories/workout-exercise.repository';
 
 export class WorkoutService {
   private workoutRepository: WorkoutRepository;
+  private workoutExerciseRepository: WorkoutExerciseRepository;
 
   constructor() {
     this.workoutRepository = new WorkoutRepository();
+    this.workoutExerciseRepository = new WorkoutExerciseRepository();
   }
 
   async createWorkout(data: CreateWorkoutInput): Promise<Workout> {
@@ -61,4 +65,15 @@ export class WorkoutService {
     }));
   }
 
+  async deleteWorkoutAndWorkoutExercises(id: string): Promise<void> {
+    const workout = await this.workoutRepository.findById(id);
+    if (!workout) {
+      throw new NotFoundError(`Workout with ID ${id} not found`);
+    }
+      
+    prisma.$transaction(() => Promise.all([
+          this.workoutExerciseRepository.deleteWorkoutExercises(id),
+          this.workoutRepository.delete(id)
+    ]));
+  }
 }

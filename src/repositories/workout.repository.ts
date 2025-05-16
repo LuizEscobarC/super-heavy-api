@@ -90,4 +90,10 @@ export class WorkoutRepository {
       },
     });
   }
+
+  async delete(id: string): Promise<Workout> {
+    return prisma.workout.delete({
+      where: { id },
+    });
+  }
 }

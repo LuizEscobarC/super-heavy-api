@@ -174,6 +174,23 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
       return workoutController.updateWorkoutExercises(request, reply);
     }
   });
+
+  // Delete workout by ID
+  fastify.route({
+    method: 'DELETE',
+    url: '/:id',
+    schema: {
+      params: z.object({
+        id: z.string().uuid()
+      }),
+      response: {
+        204: z.void()
+      }
+    },
+    handler: async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
+      return workoutController.deleteWorkout(request, reply);
+    }
+  });
 };
 
 export default workoutRoutes;

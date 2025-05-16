@@ -95,4 +95,14 @@ export class WorkoutController {
     
     return reply.status(200).send(updatedExercises);
   }
+
+  async deleteWorkout(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply
+  ) {
+    const { id } = request.params;
+    await this.workoutService.deleteWorkoutAndWorkoutExercises(id);
+    
+    return reply.status(204).send();
+  }
 }

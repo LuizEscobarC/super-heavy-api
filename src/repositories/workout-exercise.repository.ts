@@ -1,7 +1,6 @@
 import { Prisma, WorkoutExercise } from '@prisma/client';
 import { prisma } from '../config/database';
 import { NotFoundError } from '../utils/errors';
-import { UpdateWorkoutExerciseInput } from '@/schemas/workout.schema';
 
 export class WorkoutExerciseRepository {
   async create(data: Prisma.WorkoutExerciseUncheckedCreateInput): Promise<WorkoutExercise> {
@@ -67,6 +66,12 @@ export class WorkoutExerciseRepository {
 
     return await prisma.workoutExercise.createMany({
       data: exercises  
+    });
+  }
+
+  async deleteWorkoutExercises(workoutId: string): Promise<Prisma.BatchPayload> {
+    return await prisma.workoutExercise.deleteMany({
+      where: { workoutId },
     });
   }
 }
