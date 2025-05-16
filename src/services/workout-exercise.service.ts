@@ -42,8 +42,17 @@ export class WorkoutExerciseService {
     return this.repository.update(id, data);
   }
 
-  async deleteWorkoutExercise(id: string): Promise<WorkoutExercise> {
-    return this.repository.delete(id);
+  async deleteWorkoutExercise(workoutId: string,id: string): Promise<WorkoutExercise> {
+    const workoutExercise = await this.repository.findById(id);
+    if (!workoutExercise) {
+      throw new Error(`WorkoutExercise with ID ${id} not found`);
+    }
+
+    if (workoutExercise.workoutId !== workoutId) {
+      throw new Error(`Workout exercise with ID ${id} not found`);
+    }
+    
+    return await this.repository.delete(id);
   }
 
   async updateWorkoutExercises(

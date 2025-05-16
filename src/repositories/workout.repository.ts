@@ -1,4 +1,4 @@
-import { Workout, WorkoutExercise } from '@prisma/client';
+import { Exercise, Workout, WorkoutExercise } from '@prisma/client';
 import { prisma } from '../config/database';
 import { AddExerciseToWorkoutInput, CreateWorkoutInput, UpdateWorkoutInput } from '../schemas/workout.schema';
 import { NotFoundError } from '../utils/errors';
@@ -62,12 +62,7 @@ export class WorkoutRepository {
   async addExercise(
     workoutId: string,
     data: AddExerciseToWorkoutInput
-  ): Promise<WorkoutExercise> {
-    const workout = await this.findById(workoutId);
-    
-    if (!workout) {
-      throw new NotFoundError(`Workout with ID ${workoutId} not found`);
-    }
+  ): Promise<WorkoutExercise & { exercise: Exercise } | null> {
 
     // Check if exercise exists
     const exercise = await prisma.exercise.findUnique({
@@ -77,8 +72,7 @@ export class WorkoutRepository {
     if (!exercise) {
       throw new NotFoundError(`Exercise with ID ${data.exercise.id} not found`);
     }
-
-    return prisma.workoutExercise.create({
+    const { id } = await prisma.workoutExercise.create({
       data: {
         workoutId,
         exerciseId: data.exercise.id,
@@ -87,6 +81,16 @@ export class WorkoutRepository {
         reps: data.reps,
         weight: data.weight,
         rest: data.rest,
+      },
+    });
+
+    return await prisma.workoutExercise.findFirst({
+      where: {
+        workoutId,
+        id,
+      },
+      include: {
+        exercise: true,
       },
     });
   }

@@ -88,7 +88,12 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
         201: z.object({
           id: z.string().uuid(),
           workoutId: z.string().uuid(),
-          exerciseId: z.string().uuid(),
+          exercise: z.object({
+            id: z.string().uuid(),
+            name: z.string(),
+            muscle: z.string().nullable(),
+            description: z.string().nullable()
+          }),
           order: z.number(),
           series: z.number(),
           reps: z.number(),
@@ -189,6 +194,25 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
     },
     handler: async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
       return workoutController.deleteWorkout(request, reply);
+    }
+  });
+
+
+  // Delete workout exercise by ID
+  fastify.route({
+    method: 'DELETE',
+    url: '/:workoutId/exercises/:id',
+    schema: {
+      params: z.object({
+        workoutId: z.string().uuid(),
+        id: z.string().uuid()
+      }),
+      response: {
+        204: z.void()
+      }
+    },
+    handler: async (request: FastifyRequest<{ Params: { workoutId: string, id: string } }>, reply) => {
+      return workoutController.deleteWorkoutExercise(request, reply);
     }
   });
 };

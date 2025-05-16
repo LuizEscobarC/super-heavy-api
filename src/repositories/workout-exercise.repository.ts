@@ -35,21 +35,7 @@ export class WorkoutExerciseRepository {
   }
 
   async delete(id: string): Promise<WorkoutExercise> {
-    const exercise = await this.findById(id);
-    
-    if (!exercise) {
-      throw new NotFoundError(`Exercise with ID ${id} not found`);
-    }
-    
-    const workoutExerciseCount = await prisma.workoutExercise.count({
-      where: { exerciseId: id },
-    });
-    
-    if (workoutExerciseCount > 0) {
-      throw new Error(`Cannot delete exercise with ID ${id} because it is associated with workouts`);
-    }
-    
-    return prisma.workoutExercise.delete({
+    return await prisma.workoutExercise.delete({
       where: { id },
     });
   }
