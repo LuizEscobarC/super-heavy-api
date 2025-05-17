@@ -27,6 +27,13 @@ export class WorkoutRepository {
 
   async findAll(): Promise<Workout[]> {
     return prisma.workout.findMany({
+      include: {
+        exercises: {
+          include: {
+            exercise: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
