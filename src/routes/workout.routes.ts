@@ -6,9 +6,12 @@ import {
   workoutSchema, 
   CreateWorkoutInput,
   updateWorkoutExercisesSchema,
-  UpdateWorkoutExercisesInput
+  UpdateWorkoutExercisesInput,
+  UpdateWorkoutExerciseInput,
+  updateWorkoutExerciseSchema
 } from '../schemas/workout.schema';
 import { z } from 'zod';
+import { add } from 'date-fns';
 
 const workoutRoutes: FastifyPluginAsync = async (fastify) => {
   const workoutController = new WorkoutController();
@@ -177,6 +180,33 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
     },
     handler: async (request: FastifyRequest<{ Params: { id: string }, Body: UpdateWorkoutExercisesInput }>, reply) => {
       return workoutController.updateWorkoutExercises(request, reply);
+    }
+  });
+
+  // Update workout exercise by ID
+  fastify.route({
+    method: 'PUT',
+    url: '/:workoutId/exercises/:id',
+    schema: {
+      params: z.object({
+        workoutId: z.string().uuid(),
+        id: z.string().uuid()
+      }),
+      body: updateWorkoutExerciseSchema,
+      response: {
+        200: z.object({
+          id: z.string().uuid(),
+          exerciseId: z.string().uuid(),
+          order: z.number(),
+          series: z.number(),
+          reps: z.number(),
+          weight: z.number(),
+          rest: z.number()
+        })
+      }
+    },
+    handler: async (request: FastifyRequest<{ Params: { workoutId: string, id: string }, Body: UpdateWorkoutExerciseInput }>, reply) => {
+      return workoutController.updateWorkoutExercise(request, reply);
     }
   });
 

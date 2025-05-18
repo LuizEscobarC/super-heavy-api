@@ -36,10 +36,26 @@ export class WorkoutExerciseService {
   }
 
   async updateWorkoutExercise(
+    workoutId: string,
     id: string,
-    data: Partial<AddExerciseToWorkoutInput>
+    data: UpdateWorkoutExerciseInput
   ): Promise<WorkoutExercise> {
-    return this.repository.update(id, data);
+    const workout = await this.workoutRepository.findById(workoutId);
+    if (!workout || workout?.id !== workoutId) {
+      throw new Error(`Workout exercise with ID ${id} not found`);
+    }
+
+    const notNestedExercise = {
+      workoutId,
+      exerciseId: data.exercise.id,
+      order: data.order,
+      series: data.series,
+      reps: data.reps,
+      weight: data.weight,
+      rest: data.rest
+    }
+  
+    return this.repository.update(id, notNestedExercise);
   }
 
   async deleteWorkoutExercise(workoutId: string,id: string): Promise<WorkoutExercise> {

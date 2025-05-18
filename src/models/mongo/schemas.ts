@@ -61,7 +61,7 @@ const exerciseLogSchema = new Schema<IExerciseLog>(
     notes: { type: String },
     completed: { type: Boolean, default: false },
     completedAt: { type: Date },
-    rest: { type: Number, default: 60 }, // rest period in seconds
+    rest: { type: Number, default: 60 },
   },
   { timestamps: true }
 );

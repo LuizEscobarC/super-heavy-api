@@ -116,4 +116,17 @@ export class WorkoutController {
     
     return reply.status(204).send();
   }
+
+  async updateWorkoutExercise(
+    request: FastifyRequest<{ 
+      Params: { workoutId: string, id: string }, 
+      Body: UpdateWorkoutExerciseInput 
+    }>,
+    reply: FastifyReply
+  ) {
+    const { workoutId, id } = request.params;
+    const updatedExercise = await this.workoutExerciseService.updateWorkoutExercise(workoutId, id, request.body);
+    
+    return reply.status(200).send(updatedExercise);
+  }
 }

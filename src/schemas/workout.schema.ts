@@ -29,7 +29,19 @@ export const addExerciseToWorkoutSchema = z.object({
   rest: z.coerce.number().int().positive().default(60),
 });
 
-export const updateWorkoutExerciseSchema = addExerciseToWorkoutSchema;
+export const updateWorkoutExerciseSchema = z.object({
+  exercise: z.object({
+    id: z.string().uuid('Invalid exercise ID'),
+    name: z.string().min(3, 'Name must be at least 3 characters'),
+    muscle: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+  }),
+  order: z.coerce.number().int().positive('Order must be positive'),
+  series: z.coerce.number().int().positive().default(3),
+  reps: z.coerce.number().int().positive().default(12),
+  weight: z.coerce.number().nonnegative().default(0),
+  rest: z.coerce.number().int().positive().default(60),
+});
 
 export const workoutExerciseItemSchema = z.object({
   exercise: z.object({
