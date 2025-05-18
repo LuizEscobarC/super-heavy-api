@@ -4,7 +4,8 @@ import { StartWorkoutInput, AddExerciseLogInput, CompleteWorkoutInput } from '..
 import { prisma } from '../config/database';
 
 export class WorkoutLogRepository {
-  async startWorkout(workoutId: string, data: StartWorkoutInput): Promise<IWorkoutLog> {
+
+  async startWorkout(workoutId: string, data: StartWorkoutInput): Promise<Partial<IWorkoutLog> & { exercises: Partial<IExerciseLog>[] }> {
     const workoutLog = new WorkoutLog({
       workoutId,
       startTime: new Date(),
@@ -12,7 +13,34 @@ export class WorkoutLogRepository {
       notes: data.notes,
     });
 
-    return workoutLog.save();
+    const exercisesLog =  data.exercises.map((exercise) => {
+      return new ExerciseLog({
+        workoutLogId: workoutLog.id,
+        exerciseId: exercise.exerciseId,
+        workoutExerciseId: exercise.id,
+        series: exercise.series.map((series) => ({
+            weight: series.weight,
+            reps: series.reps,
+            completed: series.completed,
+        })),
+        notes: '',
+        rest: exercise.rest || 60,
+        createdAt: new Date(),
+        });
+    });
+
+    await workoutLog.save();
+
+    const exerciseLogPromises = exercisesLog.map(async (exercise) => {
+      await exercise.save();
+      return exercise.toObject();
+    });
+    const exerciseLogs = await Promise.all(exerciseLogPromises);
+
+    return {
+      ...workoutLog.toObject(),
+      exercises: exerciseLogs,
+    }
   }
 
   async completeWorkout(logId: string, data: CompleteWorkoutInput): Promise<IWorkoutLog> {

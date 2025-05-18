@@ -25,7 +25,7 @@ export interface IExerciseLog extends Document {
   notes?: string;
   completed: boolean;
   completedAt?: Date;
-  rest: number; // rest period in seconds
+  rest: number;
   createdAt: Date;
   updatedAt: Date;
 }

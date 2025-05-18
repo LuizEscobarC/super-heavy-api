@@ -18,14 +18,13 @@ export class WorkoutLogService {
   }
 
   async startWorkout(workoutId: string, data: StartWorkoutInput) {
-    // Verify workout exists
     const workout = await this.workoutRepository.findById(workoutId);
     
     if (!workout) {
       throw new NotFoundError(`Workout with ID ${workoutId} not found`);
     }
-    
-    return this.workoutLogRepository.startWorkout(workoutId, data);
+
+    return await this.workoutLogRepository.startWorkout(workoutId, data);
   }
 
   async completeWorkout(workoutId: string, logId: string, data: CompleteWorkoutInput) {
