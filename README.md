@@ -68,7 +68,13 @@ npm run dev
 - `POST /workouts` - Create a new workout
 - `GET /workouts` - List all workouts
 - `GET /workouts/:id` - Get details of a workout with its exercises
+- `PUT /workouts/:id` - Update a workout
+- `DELETE /workouts/:id` - Delete a workout and its exercises
+- `GET /workouts/:id/exercises` - Get exercises for a workout
 - `POST /workouts/:id/exercises` - Add an exercise to a workout with sets, reps, weight, and rest period
+- `PUT /workouts/:id/exercises` - Update all exercises for a workout
+- `PUT /workouts/:workoutId/exercises/:id` - Update a specific exercise in a workout
+- `DELETE /workouts/:workoutId/exercises/:id` - Delete a specific exercise from a workout
 
 ### Exercises
 
@@ -85,8 +91,9 @@ npm run dev
 - `PATCH /workouts/:id/logs/:logId/complete` - Complete a workout
 - `POST /workouts/:id/logs/:logId/exercises` - Add exercise log during workout
 - `PATCH /workouts/:id/logs/:logId/exercises/:exerciseLogId/complete` - Complete an exercise log
-- `GET /logs` - List workout logs with optional pagination
-- `GET /workouts/:id/logs/:logId/exercises` - Get exercise logs for a specific workout session
+- `GET /logs` - List all workout logs with optional pagination and filtering
+- `GET /workouts/:id/logs/:logId` - Get exercise logs for a specific workout session
+- `GET /workouts/:id/in-progress-workout` - Get the currently in-progress workout for a specific workout ID
 
 ## API Documentation
 
