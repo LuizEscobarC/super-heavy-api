@@ -23,8 +23,17 @@ export class WorkoutLogController {
   ) {
     const { id } = request.params;
     const workoutLog = await this.workoutLogService.startWorkout(id, request.body);
-    console.log('Workout log created:', workoutLog);
     return reply.status(201).send(workoutLog);
+  }
+
+  async getWorkoutInProgress(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply
+  ) {
+    const { id } = request.params;
+    let workoutInProgress = await this.workoutLogService.workoutInProgress(id);
+    
+    return reply.send(workoutInProgress);
   }
 
   async completeWorkout(

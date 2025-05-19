@@ -1,7 +1,6 @@
-import { FastifyPluginAsync } from 'fastify';
+import { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { WorkoutLogController } from '../controllers/workout-log.controller';
-import { addExerciseLogSchema, completeExerciseLogSchema, completeWorkoutSchema, startWorkoutSchema } from '../schemas/workout-log.schema';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { addExerciseLogSchema, completeExerciseLogSchema, completeWorkoutSchema, responseWorkoutLogSchema, startWorkoutSchema } from '../schemas/workout-log.schema';
 import { z } from 'zod';
 
 const workoutLogRoutes: FastifyPluginAsync = async (fastify) => {
@@ -16,6 +15,9 @@ const workoutLogRoutes: FastifyPluginAsync = async (fastify) => {
         id: z.string().uuid()
       }),
       body: startWorkoutSchema,
+      response: {
+        201: responseWorkoutLogSchema,
+      }
     },
     handler: async (request, reply) => {
       const typedRequest = request as any;
@@ -105,6 +107,23 @@ const workoutLogRoutes: FastifyPluginAsync = async (fastify) => {
     handler: async (request, reply) => {
       const typedRequest = request as any;
       return workoutLogController.getExerciseLogs(typedRequest, reply);
+    }
+  });
+
+  // await superHeavyApi.get(`${STORAGE_KEY}/${workoutId}/has-in-progress`);
+  fastify.route({
+    method: 'GET',
+    url: '/workouts/:id/in-progress-workout',
+    schema: {
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+      response: {
+        200: responseWorkoutLogSchema,
+      }
+    },
+    handler: async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
+      return workoutLogController.getWorkoutInProgress(request, reply);
     }
   });
 };

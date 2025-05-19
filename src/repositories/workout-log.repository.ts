@@ -1,23 +1,32 @@
-import { WorkoutLog, ExerciseLog, IWorkoutLog, IExerciseLog } from '../models/mongo/schemas';
+import { WorkoutLog, ExerciseLog, IWorkoutLog, IWorkoutExerciseLog } from '../models/mongo/schemas';
 import { NotFoundError } from '../utils/errors';
 import { StartWorkoutInput, AddExerciseLogInput, CompleteWorkoutInput } from '../schemas/workout-log.schema';
 import { prisma } from '../config/database';
 
 export class WorkoutLogRepository {
 
-  async startWorkout(workoutId: string, data: StartWorkoutInput): Promise<Partial<IWorkoutLog> & { exercises: Partial<IExerciseLog>[] }> {
-    const workoutLog = new WorkoutLog({
+  async startWorkout(workoutId: string, data: StartWorkoutInput): Promise<Partial<IWorkoutLog> & { exercises: Partial<IWorkoutExerciseLog>[] }> {
+    const workoutLog = await new WorkoutLog({
       workoutId,
       startTime: new Date(),
       status: 'IN_PROGRESS',
       notes: data.notes,
+    }).save();
+
+    const exerciseIds = [...new Set(data.exercises.map(e => e.exerciseId))];
+    const exercises = await prisma.exercise.findMany({
+      where: {
+        id: { in: exerciseIds },
+      }
     });
 
-    const exercisesLog =  data.exercises.map((exercise) => {
-      return new ExerciseLog({
+    const exerciseMap = new Map(exercises.map((exercise) => [exercise.id, exercise]));
+    
+    // NO N+1
+    const exercisesLog =  data.exercises.map((exercise) => ({
         workoutLogId: workoutLog.id,
-        exerciseId: exercise.exerciseId,
         workoutExerciseId: exercise.id,
+        exercise: exerciseMap.get(exercise.exerciseId),
         series: exercise.series.map((series) => ({
             weight: series.weight,
             reps: series.reps,
@@ -26,20 +35,15 @@ export class WorkoutLogRepository {
         notes: '',
         rest: exercise.rest || 60,
         createdAt: new Date(),
-        });
-    });
+    }));
 
-    await workoutLog.save();
 
-    const exerciseLogPromises = exercisesLog.map(async (exercise) => {
-      await exercise.save();
-      return exercise.toObject();
-    });
-    const exerciseLogs = await Promise.all(exerciseLogPromises);
-
+    const exerciseLogs = await ExerciseLog.insertMany(exercisesLog);
+    const workoutLogToObj = workoutLog.toObject();
     return {
-      ...workoutLog.toObject(),
-      exercises: exerciseLogs,
+      ...workoutLogToObj,
+      _id: workoutLogToObj.id.toString(),
+      exercises: exerciseLogs.map((exerciseLog) => exerciseLog.toObject()),
     }
   }
 
@@ -74,6 +78,38 @@ export class WorkoutLogRepository {
     return WorkoutLog.findById(logId);
   }
 
+  async isWorkoutInProgress(workoutId: string): Promise<boolean> {
+    const workoutLog = await WorkoutLog.findOne({ workoutId, status: 'IN_PROGRESS' });
+    return !!workoutLog;
+  }
+
+  async workoutInProgress(workoutId: string) {
+    const workoutLog = await WorkoutLog.findOne({ workoutId, status: 'IN_PROGRESS' });
+    if (!workoutLog) {
+      return null;
+    }
+    const exerciseLogs = await ExerciseLog.find({ workoutLogId: workoutLog._id });
+    return {
+      ...workoutLog.toObject(),
+      exercises: exerciseLogs.map((exerciseLog) => exerciseLog.toObject()),
+    }
+  }
+
+  async getWorkoutLogByWorkoutId(workoutId: string): Promise<Partial<IWorkoutLog> & { exercises: Partial<IWorkoutExerciseLog>[] }> {
+    const workoutLog = await WorkoutLog.findOne({ workoutId, status: 'IN_PROGRESS' });
+
+    if (!workoutLog) {
+      throw new NotFoundError(`Workout log with ID ${workoutId} not found`);
+    }
+
+   const exerciseLogs =  await ExerciseLog.find({ workoutLogId: workoutLog._id })
+
+   return {
+      ...workoutLog.toObject(),
+      exercises: exerciseLogs.map((exerciseLog) => exerciseLog.toObject()),
+   }
+  }
+
   async findAllLogs(workoutId?: string, limit = 20, page = 1): Promise<IWorkoutLog[]> {
     const query = workoutId ? { workoutId } : {};
     const skip = (page - 1) * limit;
@@ -87,7 +123,7 @@ export class WorkoutLogRepository {
   async addExerciseLog(
     workoutLogId: string,
     data: AddExerciseLogInput
-  ): Promise<IExerciseLog> {
+  ): Promise<IWorkoutExerciseLog> {
     const workoutLog = await WorkoutLog.findById(workoutLogId);
     
     if (!workoutLog) {
@@ -124,7 +160,7 @@ export class WorkoutLogRepository {
     return exerciseLog.save();
   }
 
-  async completeExerciseLog(logId: string, exerciseLogId: string): Promise<IExerciseLog> {
+  async completeExerciseLog(logId: string, exerciseLogId: string): Promise<IWorkoutExerciseLog> {
     const exerciseLog = await ExerciseLog.findOne({ 
       _id: exerciseLogId,
       workoutLogId: logId
@@ -140,7 +176,7 @@ export class WorkoutLogRepository {
     return exerciseLog.save();
   }
 
-  async findExerciseLogs(workoutLogId: string): Promise<IExerciseLog[]> {
+  async findExerciseLogs(workoutLogId: string): Promise<IWorkoutExerciseLog[]> {
     return ExerciseLog.find({ workoutLogId }).sort({ createdAt: 1 });
   }
 }

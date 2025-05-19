@@ -7,6 +7,7 @@ import {
 import { WorkoutLogRepository } from '../repositories/workout-log.repository';
 import { WorkoutRepository } from '../repositories/workout.repository';
 import { NotFoundError } from '../utils/errors';
+import { IExerciseLog, IExerciseSet, IWorkoutLog } from '@/models/mongo/schemas';
 
 export class WorkoutLogService {
   private workoutLogRepository: WorkoutLogRepository;
@@ -19,12 +20,27 @@ export class WorkoutLogService {
 
   async startWorkout(workoutId: string, data: StartWorkoutInput) {
     const workout = await this.workoutRepository.findById(workoutId);
+
+    if (await this.workoutLogRepository.isWorkoutInProgress(workoutId)) {
+      return await this.workoutLogRepository.getWorkoutLogByWorkoutId(workoutId);
+    }
     
     if (!workout) {
       throw new NotFoundError(`Workout with ID ${workoutId} not found`);
     }
+    const response = await this.workoutLogRepository.startWorkout(workoutId, data);
+    
+    return  response;
+  }
 
-    return await this.workoutLogRepository.startWorkout(workoutId, data);
+  async workoutInProgress(workoutId: string) {
+    const workout = await this.workoutRepository.findById(workoutId);
+    
+    if (!workout) {
+      throw new NotFoundError(`Workout with ID ${workoutId} not found`);
+    }
+    
+    return await this.workoutLogRepository.workoutInProgress(workoutId);
   }
 
   async completeWorkout(workoutId: string, logId: string, data: CompleteWorkoutInput) {

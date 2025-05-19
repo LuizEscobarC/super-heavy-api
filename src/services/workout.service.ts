@@ -60,7 +60,7 @@ export class WorkoutService {
       exercise: {
         id: exercise.exercise.id,
         name: exercise.exercise.name,
-        muscle: exercise.exercise.muscle,
+        muscle: exercise.exercise?.muscle,
         description: exercise.exercise.description
       },
       order: exercise.order,

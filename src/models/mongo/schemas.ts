@@ -17,9 +17,17 @@ export interface IExerciseSet {
   timestamp: Date;
 }
 
-export interface IExerciseLog extends Document {
+export interface IExerciseLog {
+    name: string;
+    muscle?: string;
+    description?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface IWorkoutExerciseLog extends Document {
   workoutLogId: string;
-  exerciseId: string;
+  exercise: IExerciseLog;
   workoutExerciseId: string;
   series: IExerciseSet[];
   notes?: string;
@@ -45,10 +53,16 @@ const workoutLogSchema = new Schema<IWorkoutLog>(
   { timestamps: true }
 );
 
-const exerciseLogSchema = new Schema<IExerciseLog>(
+const exerciseLogSchema = new Schema<IWorkoutExerciseLog>(
   {
     workoutLogId: { type: String, required: true, index: true },
-    exerciseId: { type: String, required: true },
+    exercise: {
+        name: { type: String, required: true },
+        muscle: { type: String },
+        description: { type: String },
+        createdAt: { type: Date, default: Date.now },
+        updatedAt: { type: Date, default: Date.now },
+    },
     workoutExerciseId: { type: String, required: true },
     series: [
       {
@@ -67,4 +81,4 @@ const exerciseLogSchema = new Schema<IExerciseLog>(
 );
 
 export const WorkoutLog = mongoose.model<IWorkoutLog>('WorkoutLog', workoutLogSchema);
-export const ExerciseLog = mongoose.model<IExerciseLog>('ExerciseLog', exerciseLogSchema);
+export const ExerciseLog = mongoose.model<IWorkoutExerciseLog>('ExerciseLog', exerciseLogSchema);

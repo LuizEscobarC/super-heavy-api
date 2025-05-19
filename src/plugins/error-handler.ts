@@ -26,6 +26,7 @@ const errorHandler: FastifyPluginAsync = async (fastify) => {
   fastify.setErrorHandler((error, request, reply) => {
     // Handle Zod validation errors
     if (error instanceof ZodError) {
+      console.error('Fastify error:', error);
       return reply.status(400).send({
         statusCode: 400,
         error: 'Bad Request',
@@ -36,6 +37,7 @@ const errorHandler: FastifyPluginAsync = async (fastify) => {
 
     // Handle custom app errors
     if (error instanceof AppError) {
+      console.error('Fastify error:', error);
       return reply.status(error.statusCode).send({
         statusCode: error.statusCode,
         error: getErrorName(error.statusCode),
@@ -59,7 +61,7 @@ const errorHandler: FastifyPluginAsync = async (fastify) => {
 
     // In production, don't expose internal error details
     const isProduction = process.env.NODE_ENV === 'production';
-    
+    console.error('Fastify error:', error);
     return reply.status(500).send({
       statusCode: 500,
       error: 'Internal Server Error',

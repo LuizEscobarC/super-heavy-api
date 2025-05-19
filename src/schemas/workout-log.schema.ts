@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+const dateOrString = z.union([z.string(), z.date()]).transform((val) =>
+  val instanceof Date ? val.toISOString() : val
+);
+
 // WorkoutLog schemas
 export const workoutLogSchema = z.object({
   id: z.string(),
@@ -70,6 +74,51 @@ export const addExerciseLogSchema = z.object({
   rest: z.number().int().positive().optional(),
 });
 
+
+ export const responseExerciseLogSchema = z.object({
+  _id: z.any(),
+  workoutLogId: z.string(),
+  exercise: z.object({
+    _id: z.any(),
+    name: z.string(),
+    muscle: z.string(),
+    description: z.string(),
+    createdAt: dateOrString,
+    updatedAt: dateOrString,
+  }).passthrough(),
+  workoutExerciseId: z.string().uuid(),
+  series: z.array(
+    z.object({
+      _id: z.any(),
+      weight: z.number().nonnegative('Weight must be non-negative'),
+      reps: z.number().int().positive('Reps must be positive'),
+      completed: z.boolean().default(true),
+      timestamp: dateOrString,
+    }).passthrough()
+  ),
+  notes: z.string().nullable().optional(),
+  completed: z.boolean().default(false),
+  rest: z.number().int().positive('Rest must be positive').optional(),
+  createdAt: dateOrString,
+  updatedAt: dateOrString,
+  __v: z.number().optional(),
+});
+
+export const responseWorkoutLogSchema = z.object({
+  _id: z.any(),
+  workoutId: z.string().uuid(),
+  startTime: dateOrString,
+  endTime: z.date().nullable().optional(),
+  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'CANCELED']),
+  notes: z.string().nullable().optional(),
+  createdAt: dateOrString,
+  updatedAt: dateOrString,
+  __v: z.number().optional(),
+  exercises: z.array(responseExerciseLogSchema.passthrough())
+}).passthrough();
+
+
+
 export const completeExerciseLogSchema = z.object({
   notes: z.string().optional(),
 });
@@ -82,3 +131,5 @@ export type ExerciseSet = z.infer<typeof exerciseSetSchema>;
 export type ExerciseLog = z.infer<typeof exerciseLogSchema>;
 export type AddExerciseLogInput = z.infer<typeof addExerciseLogSchema>;
 export type CompleteExerciseLogInput = z.infer<typeof completeExerciseLogSchema>;
+export type ResponseWorkoutLog = z.infer<typeof responseWorkoutLogSchema>;
+export type ResponseExerciseLog = z.infer<typeof responseExerciseLogSchema>;

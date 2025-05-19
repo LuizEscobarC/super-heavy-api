@@ -44,7 +44,7 @@ export class WorkoutRepository {
     });
   }
 
-  async findByIdWithExercises(id: string) {
+  async findByIdWithExercises(id: string): Promise<Workout & { exercises: (WorkoutExercise & { exercise: Exercise })[] } | null> {
     const workout = await prisma.workout.findUnique({
       where: { id },
       include: {
