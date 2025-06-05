@@ -179,4 +179,58 @@ export class WorkoutLogRepository {
   async findExerciseLogs(workoutLogId: string): Promise<IWorkoutExerciseLog[]> {
     return ExerciseLog.find({ workoutLogId }).sort({ createdAt: 1 });
   }
+
+  async updateSeries(
+    workoutId: string,
+    exerciseLogId: string,
+    seriesId: string,
+    data: { actualWeight?: number; actualReps?: number }
+  ): Promise<IWorkoutExerciseLog> {
+    // First find the current in-progress workout log for this workout
+    const workoutLog = await WorkoutLog.findOne({ 
+      workoutId, 
+      status: 'IN_PROGRESS' 
+    });
+
+    if (!workoutLog) {
+      throw new NotFoundError(`No in-progress workout found for workout ID ${workoutId}`);
+    }
+
+    // Find the exercise log
+    const exerciseLog = await ExerciseLog.findOne({
+      _id: exerciseLogId,
+      workoutLogId: workoutLog._id
+    });
+
+    if (!exerciseLog) {
+      throw new NotFoundError(`Exercise log with ID ${exerciseLogId} not found in current workout`);
+    }
+
+    // Alternative approach using MongoDB's positional operator
+    const updateFields: any = {};
+    
+    if (data.actualWeight !== undefined) {
+      updateFields['series.$.weight'] = data.actualWeight;
+    }
+    if (data.actualReps !== undefined) {
+      updateFields['series.$.reps'] = data.actualReps;
+    }
+
+    // Use MongoDB's positional operator to update the specific series
+    const updatedExerciseLog = await ExerciseLog.findOneAndUpdate(
+      {
+        _id: exerciseLogId,
+        workoutLogId: workoutLog._id,
+        'series._id': seriesId
+      },
+      { $set: updateFields },
+      { new: true }
+    );
+
+    if (!updatedExerciseLog) {
+      throw new NotFoundError(`Series with ID ${seriesId} not found in exercise log ${exerciseLogId}`);
+    }
+
+    return updatedExerciseLog;
+  }
 }

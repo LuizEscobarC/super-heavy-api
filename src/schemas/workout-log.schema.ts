@@ -123,6 +123,11 @@ export const completeExerciseLogSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const updateSeriesSchema = z.object({
+  actualWeight: z.coerce.number().nonnegative('Weight must be non-negative').optional(),
+  actualReps: z.coerce.number().int().positive('Reps must be positive').optional(),
+});
+
 // Types for use in controllers and services
 export type WorkoutLog = z.infer<typeof workoutLogSchema>;
 export type StartWorkoutInput = z.infer<typeof startWorkoutSchema>;
@@ -131,5 +136,6 @@ export type ExerciseSet = z.infer<typeof exerciseSetSchema>;
 export type ExerciseLog = z.infer<typeof exerciseLogSchema>;
 export type AddExerciseLogInput = z.infer<typeof addExerciseLogSchema>;
 export type CompleteExerciseLogInput = z.infer<typeof completeExerciseLogSchema>;
+export type UpdateSeriesInput = z.infer<typeof updateSeriesSchema>;
 export type ResponseWorkoutLog = z.infer<typeof responseWorkoutLogSchema>;
 export type ResponseExerciseLog = z.infer<typeof responseExerciseLogSchema>;

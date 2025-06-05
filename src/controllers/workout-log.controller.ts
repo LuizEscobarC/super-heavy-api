@@ -4,7 +4,8 @@ import {
   AddExerciseLogInput, 
   CompleteExerciseLogInput, 
   CompleteWorkoutInput, 
-  StartWorkoutInput
+  StartWorkoutInput,
+  UpdateSeriesInput
 } from '../schemas/workout-log.schema';
 
 export class WorkoutLogController {
@@ -106,5 +107,24 @@ export class WorkoutLogController {
     const exerciseLogs = await this.workoutLogService.getExerciseLogs(id, logId);
     
     return reply.send(exerciseLogs);
+  }
+
+  async updateSeries(
+    request: FastifyRequest<{
+      Params: { workoutId: string; exerciseId: string; serieId: string };
+      Body: { actualWeight?: number; actualReps?: number };
+    }>,
+    reply: FastifyReply
+  ) {
+    const { workoutId, exerciseId: exerciseLogId, serieId } = request.params;
+    
+    const updatedExerciseLog = await this.workoutLogService.updateSeries(
+      workoutId,
+      exerciseLogId,
+      serieId,
+      request.body
+    );
+    
+    return reply.send(updatedExerciseLog);
   }
 }

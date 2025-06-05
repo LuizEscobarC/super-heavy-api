@@ -89,4 +89,16 @@ export class WorkoutLogService {
     
     return this.workoutLogRepository.findExerciseLogs(logId);
   }
+
+  async updateSeries(
+    workoutId: string,
+    exerciseLogId: string,
+    seriesId: string,
+    data: { actualWeight?: number; actualReps?: number }
+  ) {
+    // Verify workout exists
+    await this.workoutRepository.findById(workoutId);
+    
+    return this.workoutLogRepository.updateSeries(workoutId, exerciseLogId, seriesId, data);
+  }
 }

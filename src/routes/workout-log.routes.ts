@@ -1,6 +1,6 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { WorkoutLogController } from '../controllers/workout-log.controller';
-import { addExerciseLogSchema, completeExerciseLogSchema, completeWorkoutSchema, responseWorkoutLogSchema, startWorkoutSchema } from '../schemas/workout-log.schema';
+import { addExerciseLogSchema, completeExerciseLogSchema, completeWorkoutSchema, responseExerciseLogSchema, responseWorkoutLogSchema, startWorkoutSchema, updateSeriesSchema } from '../schemas/workout-log.schema';
 import { z } from 'zod';
 
 const workoutLogRoutes: FastifyPluginAsync = async (fastify) => {
@@ -107,6 +107,27 @@ const workoutLogRoutes: FastifyPluginAsync = async (fastify) => {
     handler: async (request, reply) => {
       const typedRequest = request as any;
       return workoutLogController.getExerciseLogs(typedRequest, reply);
+    }
+  });
+
+  // Update specific series within an exercise
+  fastify.route({
+    method: 'PATCH',
+    url: '/workouts/:workoutId/exercises-log/:exerciseId/series/:serieId',
+    schema: {
+      params: z.object({
+        workoutId: z.string().uuid(),
+        exerciseId: z.string(),
+        serieId: z.string(),
+      }),
+      body: updateSeriesSchema,
+      response: {
+        200: z.any(),
+      }
+    },
+    handler: async (request, reply) => {
+      const typedRequest = request as any;
+      return workoutLogController.updateSeries(typedRequest, reply);
     }
   });
 
