@@ -31,7 +31,7 @@ export class WorkoutService {
   }
 
   async updateWorkout(id: string, data: UpdateWorkoutInput): Promise<Workout> {
-    return this.workoutRepository.update(id, data);
+    return await this.workoutRepository.update(id, data);
   }
 
   async getWorkoutWithExercises(id: string) {

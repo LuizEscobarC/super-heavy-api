@@ -159,7 +159,7 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
     },
     handler: async (request: FastifyRequest<{ Params: { id: string }, Body: CreateWorkoutInput }>, reply) => {
       const typedRequest = request as any;
-      return workoutController.updateWorkout(typedRequest, reply);
+      return await workoutController.updateWorkout(typedRequest, reply);
     }
   });
 

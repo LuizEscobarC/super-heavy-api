@@ -92,7 +92,7 @@ export class WorkoutController {
     const { exercises } = request.body;
 
     const updatedExercises = await this.workoutExerciseService.updateWorkoutExercises(id, exercises);
-    
+
     return reply.status(200).send(updatedExercises);
   }
 

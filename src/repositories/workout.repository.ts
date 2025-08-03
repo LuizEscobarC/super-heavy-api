@@ -13,7 +13,7 @@ export class WorkoutRepository {
       throw new NotFoundError(`Workout with ID ${id} not found`);
     }
 
-    return prisma.workout.update({
+    return await prisma.workout.update({
       where: { id },
       data,
     });
