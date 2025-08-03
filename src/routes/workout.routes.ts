@@ -242,7 +242,7 @@ const workoutRoutes: FastifyPluginAsync = async (fastify) => {
       }
     },
     handler: async (request: FastifyRequest<{ Params: { workoutId: string, id: string } }>, reply) => {
-      return workoutController.deleteWorkoutExercise(request, reply);
+      return await workoutController.deleteWorkoutExercise(request, reply);
     }
   });
 };

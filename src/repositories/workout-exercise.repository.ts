@@ -16,7 +16,7 @@ export class WorkoutExerciseRepository {
   }
 
   async findById(id: string): Promise<WorkoutExercise | null> {
-    return prisma.workoutExercise.findUnique({
+    return await prisma.workoutExercise.findUnique({
       where: { id },
     });
   }
@@ -27,8 +27,8 @@ export class WorkoutExerciseRepository {
     if (!exercise) {
       throw new NotFoundError(`Exercise with ID ${id} not found`);
     }
-    
-    return prisma.workoutExercise.update({
+
+    return await prisma.workoutExercise.update({
       where: { id },
       data,
     });

@@ -45,7 +45,7 @@ services:
       dockerfile: Dockerfile
     container_name: workout-api
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/workout_tracker?schema=public
